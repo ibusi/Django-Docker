@@ -1,0 +1,29 @@
+version: '3.3'
+
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - static_data:/vol/web
+    environment:
+      - SECRET_KEY=samplesecretkey123
+      - ALLOWED_HOSTS=127.0.0.1, localhsot
+
+  proxy:
+    build:
+      context: ./proxy
+    volumes:
+      - static_data:/vol/static
+    ports:
+      - "8080:8080"
+
+    #今回のはproxyがappに依存する。app→proxyの順に起動する。
+    #proxyコンテナからappコンテナへのネットワークのつながりがサービスネームappを通してでき
+    #なのでdefault.confのlocationでappを指定している
+    depends_on:
+      - app
+
+#static_dataという新しいvolumeを作っている。appとproxyでシェアシェアされている
+volumes:
+  static_data:
